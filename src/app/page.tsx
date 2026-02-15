@@ -43,9 +43,18 @@ export default function Home() {
   const fetchCart = useCallback(async () => {
     const sessionId = getSessionId();
     if (!sessionId) return;
-    const res = await fetch(`/api/cart?session_id=${sessionId}`);
-    const data = await res.json();
-    if (Array.isArray(data)) setCart(data);
+    try {
+      const res = await fetch(`/api/cart?session_id=${sessionId}`);
+      if (!res.ok) {
+        console.error("Failed to fetch cart:", res.status, res.statusText);
+        setLoading(false);
+        return;
+      }
+      const data = await res.json();
+      if (Array.isArray(data)) setCart(data);
+    } catch (err) {
+      console.error("Error fetching cart:", err);
+    }
     setLoading(false);
   }, []);
 
